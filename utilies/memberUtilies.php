@@ -40,7 +40,7 @@
             }
             $RandomNumber = rand(1, $countAvilable);
             foreach($data as $key => $val){
-                if($RandomNumber == 1){
+                if($RandomNumber == 1 && $val['status'] == 1){
                     $data[$key]['status'] = 2;
                     $fp = fopen('../data.json', 'w');
                     fwrite($fp, json_encode($data));

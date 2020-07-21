@@ -757,7 +757,7 @@ if(isset($_GET['type']) && $_GET['type'] == "reset")
                   <h2 id="choseNumber" class="text-center text-important"></h2>
               </div>
               <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="location.reload();">Close</button>
               </div>
           </div>
       </div>
