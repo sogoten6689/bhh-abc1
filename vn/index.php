@@ -2,6 +2,7 @@
   include '../utilies/memberUtilies.php';
 
   $memberUtilies = new MemberUtilies;
+  $statues = array(1 => 'Sẵn sàng', 2 => 'Đã lên', 3 => 'Vắng mặt', 4 => 'Trường hợp khác');
   $members = $memberUtilies->indexMember();
   
 if(isset($_POST['memberName']))
@@ -10,18 +11,41 @@ if(isset($_POST['memberName']))
     header('Pragma: no-cache');
     header('Content-Type: text/json');
     header('Content-type: application/json');
-    $memberUtilies->storeMember($_POST['memberName'], $_POST['memberNumber'], $_POST['memberNote'], $_POST['memberStatus']);
+    echo json_encode($memberUtilies->storeMember($_POST['memberName'], $_POST['memberNumber'], $_POST['memberNote'], $_POST['memberStatus'], $_POST['memberPhone']));
     return;
+    
 }
-if(isset($_POST['type']))
+if(isset($_POST['type']) && $_POST['type'] == "remove")
 {
     header('Cache-Control: no-cache');
     header('Pragma: no-cache');
     header('Content-Type: text/json');
     header('Content-type: application/json');
-    $memberUtilies->removeMember($_POST['memberNumber']);
+    echo json_encode($memberUtilies->removeMember($_POST['memberPhone']));
     return;
 }
+
+if(isset($_GET['type']) && $_GET['type'] == "random")
+{
+    header('Cache-Control: no-cache');
+    header('Pragma: no-cache');
+    header('Content-Type: text/json');
+    header('Content-type: application/json');
+    echo json_encode($memberUtilies->randomMember());
+    return;
+}
+
+
+if(isset($_GET['type']) && $_GET['type'] == "reset")
+{
+    header('Cache-Control: no-cache');
+    header('Pragma: no-cache');
+    header('Content-Type: text/json');
+    header('Content-type: application/json');
+    echo json_encode($memberUtilies->reset());
+    return;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -115,30 +139,49 @@ if(isset($_POST['type']))
             Hãy chọn một người bạn đặc biệt nhé!  
           </p>
         </div>
+        <div class="row">
+            <div class="col-4">
+              <button type="button" class="btn btn-primary btn-new-member">Thêm thành viên</button>
+            </div>
+            <div class="col-4 text-center">
+              <button type="button" class="btn btn-primary btn-choose-member">Chọn thành viên</button>
+            </div>
+            <div class="col-4 text-right">
+              <button type="button" class="btn btn-primary btn-reset">Reset|NewGame</button>
+            </div>
+        </div>
 
-        <button type="button" class="btn btn-primary btn-new-member">Thêm thành viên</button>
         <table class="table table-striped">
           <thead>
             <tr>
-              <th>Tên</th>
-              <th>Số</th>
+              <th>Số thứ tự</th>
               <th>Ghi chú</th>
+              <th>Tên</th>
+              <th>Số điện thoại</th>
               <th>Trạng thái</th>
               <th>Thao tác</th>
             </tr>
           </thead>
           <tbody>
-            <?php foreach($members as $key => $val ) {?>
+            <?php foreach($members as $key => $val) { ?>
               <tr>
-                <td><?php echo $val['name']; ?></td>
                 <td><?php echo $val['number']; ?></td>
+                <td><?php echo $val['name']; ?></td>
                 <td><?php echo $val['note']; ?></td>
+                <td><?php echo $val['phone']; ?></td>
                 <td>
-                  <a type="button" class="btn btn-success">Sẵn sàng</a>
+                    <?php if($val['status'] == 1) { ?>
+                      <span class="badge badge-success">Sẵn sàng</span>
+                    <?php } else if($val['status'] == 2) { ?>
+                      <span class="badge badge-warning">Đã lên</span>
+                    <?php } else if($val['status'] == 3) { ?>
+                      <span class="badge badge-secondary">Vắng mặt</span>
+                    <?php } else { ?>
+                      <span class="badge badge-warning">Trường hợp khác</span>
+                    <?php } ?>
                 </td>
                 <td>
-                  <button type="button" class="btn btn-info btn-edit"  onclick="editMember(<?php $val['number'] ?>)">Sửa</button>
-                  <button type="button" class="btn btn-danger btn-remove"  onclick="removeMember(<?php $val['number'] ?>)">Xóa</button>
+                  <button type="button" class="btn btn-danger btn-remove"  onclick="removeMember(<?php echo $val['phone'] ?>)">Xóa</button>
                 </td>
               </tr>
             <?php } ?>
@@ -666,9 +709,14 @@ if(isset($_POST['type']))
                           <input id="memberName" type="text" class="form-control" placeholder="Tên thành viên"/>
                           <span class="text-danger" id="memberNameError"></span>
                       </div>
+                      <div class="col-12">
+                          <label>Số điện thoại: <span class="text-danger">*</span> </label>
+                          <input id="memberPhone" type="text" class="form-control" placeholder="Số điện thoại"/>
+                          <span class="text-danger" id="memberPhoneError"></span>
+                      </div>
                       <div class="col-6">
                           <label>Trạng thái:</label>
-                            <select id="courseTypeEdit" class="custom-select">
+                            <select id="memberStatus" class="custom-select">
                                 <option value="1">Sẵn sàng</option>
                                 <option value="2">Đã lên</option>
                                 <option value="3">Vắng mặt</option>
@@ -688,6 +736,27 @@ if(isset($_POST['type']))
               </div>
               <div class="modal-footer">
                   <button type="button" class="btn btn-primary btn-save-member">Save</button>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <div id="modalChooseMember" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title">Thành viên được chọn!</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <h1 id="choseName" class="text-center text-danger"></h1>
+                  <br/>
+                  <h2 id="choseNumber" class="text-center text-important"></h2>
+              </div>
+              <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
               </div>
           </div>
@@ -789,10 +858,6 @@ if(isset($_POST['type']))
 </body>
 <script>
   $('.btn-new-member').click(function() {
-      // $('#courseIdEdit').val('');
-      // $('#courseNameEdit').val('');
-      // $('#courseHeldDateEdit').val('');
-      // $('#courseDescriptionEdit').text('');
       $('#modalNewMember').modal({
           refresh: true
       });
@@ -816,6 +881,7 @@ if(isset($_POST['type']))
 
   $('.btn-save-member').click(function() {
     $memberName = $('#memberName').val();
+    $memberPhone = $('#memberPhone').val();
     $memberStatus = $('#memberStatus').val();
     $memberNumber = $('#memberNumber').val();
     $memberNote = $('#memberNote').val();
@@ -826,6 +892,7 @@ if(isset($_POST['type']))
           type: 'POST',
           data: { 
               "memberName": $memberName,
+              "memberPhone": $memberPhone,
               "memberStatus": $memberStatus,
               "memberNumber": $memberNumber,
               "memberNote": $memberNote,
@@ -840,12 +907,12 @@ if(isset($_POST['type']))
     }
   });
 
-  function removeMember($memberNumber){
+  function removeMember($memberPhone){
     $.ajax({
           url: 'index.php',
           type: 'POST',
           data: { 
-              "memberNumber": $memberNumber,
+              "memberPhone": $memberPhone,
               "type": 'remove'
               },
           success: function (response) {
@@ -856,6 +923,43 @@ if(isset($_POST['type']))
           }
       });
   }
+  $('.btn-choose-member').click(function() {
+    $.ajax({
+          url: 'index.php',
+          type: 'GET',
+          data: { 
+              "type": "random",
+              },
+          success: function (response) {
+              console.log(response);
+              if(response != 'succeed'){
+                $('#choseName').text(response['name']);
+                $('#choseNumber').text(response['number']);
+                $('#modalChooseMember').modal({
+                    refresh: true
+                });
+              }
+              else{
+                alert("Không có thành viên sẵn sàng!")
+              }
+          }
+      });
+  });
+
+  $('.btn-reset').click(function() {
+    $.ajax({
+          url: 'index.php',
+          type: 'GET',
+          data: { 
+              "type": "reset",
+              },
+          success: function (response) {
+                alert("Reset thành công!")
+                location.reload();
+          }
+      });
+  });
+  
   
 </script>
 
