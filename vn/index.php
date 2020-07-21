@@ -1,3 +1,29 @@
+<?php 
+  include '../utilies/memberUtilies.php';
+
+  $memberUtilies = new MemberUtilies;
+  $members = $memberUtilies->indexMember();
+  
+if(isset($_POST['memberName']))
+{
+    header('Cache-Control: no-cache');
+    header('Pragma: no-cache');
+    header('Content-Type: text/json');
+    header('Content-type: application/json');
+    $memberUtilies->storeMember($_POST['memberName'], $_POST['memberNumber'], $_POST['memberNote'], $_POST['memberStatus']);
+    return;
+}
+if(isset($_POST['type']))
+{
+    header('Cache-Control: no-cache');
+    header('Pragma: no-cache');
+    header('Content-Type: text/json');
+    header('Content-type: application/json');
+    $memberUtilies->removeMember($_POST['memberNumber']);
+    return;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="vn">
 
@@ -5,7 +31,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Squadfree Bootstrap Template - Index</title>
+  <title>ABC1- Index</title>
   <meta content="" name="descriptison">
   <meta content="" name="keywords">
 
@@ -50,8 +76,8 @@
       <nav class="nav-menu d-none d-lg-block">
         <ul>
           <li class="active"><a href="#header">Trang chủ</a></li>
+          <li><a href="#services">Bốc số</a></li>
           <li><a href="#about">Giới Thiệu</a></li>
-          <li><a href="#services">Dịch vụ</a></li>
           <li><a href="#portfolio">Danh mục</a></li>
           <li><a href="#testimonials">Nhận xét</a></li>
           <li><a href="#team">Thành viên</a></li>
@@ -78,6 +104,85 @@
   </section><!-- End Hero -->
 
   <main id="main">
+
+    <!-- ======= Services Section ======= -->
+    <section id="services" class="services">
+      <div class="container">
+
+        <div class="section-title" data-aos="fade-in" data-aos-delay="100">
+          <h2>Bốc số</h2>
+          <p>
+            Hãy chọn một người bạn đặc biệt nhé!  
+          </p>
+        </div>
+
+        <button type="button" class="btn btn-primary btn-new-member">Thêm thành viên</button>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Tên</th>
+              <th>Số</th>
+              <th>Ghi chú</th>
+              <th>Trạng thái</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach($members as $key => $val ) {?>
+              <tr>
+                <td><?php echo $val['name']; ?></td>
+                <td><?php echo $val['number']; ?></td>
+                <td><?php echo $val['note']; ?></td>
+                <td>
+                  <a type="button" class="btn btn-success">Sẵn sàng</a>
+                </td>
+                <td>
+                  <button type="button" class="btn btn-info btn-edit"  onclick="editMember(<?php $val['number'] ?>)">Sửa</button>
+                  <button type="button" class="btn btn-danger btn-remove"  onclick="removeMember(<?php $val['number'] ?>)">Xóa</button>
+                </td>
+              </tr>
+            <?php } ?>
+          </tbody>
+        </table>
+
+        <div class="row">
+          <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0">
+            <div class="icon-box" data-aos="fade-up">
+              <div class="icon"><i class="bx bxl-dribbble"></i></div>
+              <h4 class="title"><a href="">Đội nhóm</a></h4>
+              <p class="description">Đội nhóm - nơi mà người chia sẻ cũng như người được chia sẻ phát triển rất nhiều. 
+              Bạn sẽ thực sự giỏi khi bạn tự tin chia sẻ kiến thức của bạn cho người đi sau.</p>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0">
+            <div class="icon-box" data-aos="fade-up" data-aos-delay="100">
+              <div class="icon"><i class="bx bx-file"></i></div>
+              <h4 class="title"><a href="">Đọc sách</a></h4>
+              <p class="description">Đọc sách là cách tiếp thu kiến thức, là học được những điều mà tự bản thân dạy bản thân.</p>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0">
+            <div class="icon-box" data-aos="fade-up" data-aos-delay="200">
+              <div class="icon"><i class="bx bx-tachometer"></i></div>
+              <h4 class="title"><a href="">Phát triển bản thân</a></h4>
+              <p class="description">Nếu bạn có một niềm đam mê phát triển bản thân thì thật tuyệt. Hãy vì bản thân và liên tục học hỏi bản thân nhé, sau đó vì gia đình và tất cả mọi người nữa.</p>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0">
+            <div class="icon-box" data-aos="fade-up" data-aos-delay="300">
+              <div class="icon"><i class="bx bx-world"></i></div>
+              <h4 class="title"><a href="">Thế giới</a></h4>
+              <p class="description">Nhớ là hãy luôn yêu thương mọi người, làm những điều ý nghĩa, hoà nhập với tổ quốc và thế giới.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section><!-- End Services Section -->
 
     <!-- ======= About Section ======= -->
     <section id="about" class="about">
@@ -125,56 +230,6 @@
 
       </div>
     </section><!-- End About Section -->
-
-    <!-- ======= Services Section ======= -->
-    <section id="services" class="services">
-      <div class="container">
-
-        <div class="section-title" data-aos="fade-in" data-aos-delay="100">
-          <h2>Dịch vụ</h2>
-          <p>
-            Chức năng này đang xây dựng vì chúng tuii cũng không biết sẽ có dịch vụ gì, nhưng trong tương lai, chúng tuii hi vọng sẽ xây dựng những dịch vụ tự động và đem lại hiệu quả cho mọi người, bên cạnh đó cũng sẽ có phát triển áo nhóm, logo dành cho nhóm.
-          </p>
-        </div>
-
-        <div class="row">
-          <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0">
-            <div class="icon-box" data-aos="fade-up">
-              <div class="icon"><i class="bx bxl-dribbble"></i></div>
-              <h4 class="title"><a href="">Đội nhóm</a></h4>
-              <p class="description">Đội nhóm - nơi mà người chia sẻ cũng như người được chia sẻ phát triển rất nhiều. 
-              Bạn sẽ thực sự giỏi khi bạn tự tin chia sẻ kiến thức của bạn cho người đi sau.</p>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0">
-            <div class="icon-box" data-aos="fade-up" data-aos-delay="100">
-              <div class="icon"><i class="bx bx-file"></i></div>
-              <h4 class="title"><a href="">Đọc sách</a></h4>
-              <p class="description">Đọc sách là cách tiếp thu kiến thức, là học được những điều mà tự bản thân dạy bản thân.</p>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0">
-            <div class="icon-box" data-aos="fade-up" data-aos-delay="200">
-              <div class="icon"><i class="bx bx-tachometer"></i></div>
-              <h4 class="title"><a href="">Phát triển bản thân</a></h4>
-              <p class="description">Nếu bạn có một niềm đam mê phát triển bản thân thì thật tuyệt. Hãy vì bản thân và liên tục học hỏi bản thân nhé, sau đó vì gia đình và tất cả mọi người nữa.</p>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0">
-            <div class="icon-box" data-aos="fade-up" data-aos-delay="300">
-              <div class="icon"><i class="bx bx-world"></i></div>
-              <h4 class="title"><a href="">Thế giới</a></h4>
-              <p class="description">Nhớ là hãy luôn yêu thương mọi người, làm những điều ý nghĩa, hoà nhập với tổ quốc và thế giới.</p>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </section><!-- End Services Section -->
 
     <!-- ======= Counts Section ======= -->
     <section id="counts" class="counts  section-bg">
@@ -592,7 +647,52 @@
     </section><!-- End Contact Section -->
 
   </main><!-- End #main -->
-
+        
+  
+  <div id="modalNewMember" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title">Thành viên</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <input id="memberId" type="hidden"/>
+                  <div class="row mb-3">
+                      <div class="col-12">
+                          <label>Tên: <span class="text-danger">*</span> </label>
+                          <input id="memberName" type="text" class="form-control" placeholder="Tên thành viên"/>
+                          <span class="text-danger" id="memberNameError"></span>
+                      </div>
+                      <div class="col-6">
+                          <label>Trạng thái:</label>
+                            <select id="courseTypeEdit" class="custom-select">
+                                <option value="1">Sẵn sàng</option>
+                                <option value="2">Đã lên</option>
+                                <option value="3">Vắng mặt</option>
+                                <option value="4">Trường hợp khác</option>
+                            </select>
+                      </div>
+                      <div class="col-6">
+                          <label>Số: <span class="text-danger">*</span> </label>
+                          <input id="memberNumber" type="number" class="form-control" min="1" max="40"/>
+                          <span class="text-danger" id="memberNumberError"></span>
+                      </div>
+                      <div class="col-12">
+                          <label>Ghi chú:</label>
+                          <textarea id="memberNote" type="text" class="form-control" placeholder="Ghi chú/ mô tả!"></textarea>
+                      </div>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-primary btn-save-member">Save</button>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+          </div>
+      </div>
+  </div>
   <!-- ======= Footer ======= -->
   <footer id="footer">
     <div class="footer-top">
@@ -671,6 +771,7 @@
   <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
 
   <!-- Vendor JS Files -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="../assets/vendor/jquery/jquery.min.js"></script>
   <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/vendor/jquery.easing/jquery.easing.min.js"></script>
@@ -686,5 +787,76 @@
   <script src="../assets/js/main.js"></script>
 
 </body>
+<script>
+  $('.btn-new-member').click(function() {
+      // $('#courseIdEdit').val('');
+      // $('#courseNameEdit').val('');
+      // $('#courseHeldDateEdit').val('');
+      // $('#courseDescriptionEdit').text('');
+      $('#modalNewMember').modal({
+          refresh: true
+      });
+  });
+
+  function checkValidate($memberName, $memberNumber){
+    $('#memberNameError').text("");
+    $('#memberNumberError').text("");
+
+    if($memberName == ""){
+      $('#memberNameError').text("Vui lòng điền tên");
+      return false;
+    }
+    if($memberNumber == "")
+    {
+      $('#memberNumberError').text("Vui lòng điền số");
+      return false;
+    }
+    return true;    
+  }
+
+  $('.btn-save-member').click(function() {
+    $memberName = $('#memberName').val();
+    $memberStatus = $('#memberStatus').val();
+    $memberNumber = $('#memberNumber').val();
+    $memberNote = $('#memberNote').val();
+    $isValidate = checkValidate($memberName, $memberNumber);
+    if($isValidate){
+      $.ajax({
+          url: 'index.php',
+          type: 'POST',
+          data: { 
+              "memberName": $memberName,
+              "memberStatus": $memberStatus,
+              "memberNumber": $memberNumber,
+              "memberNote": $memberNote,
+              },
+          success: function (response) {
+              console.log(response);
+              if(response == 'succeed'){
+                  location.reload();
+              }
+          }
+      });
+    }
+  });
+
+  function removeMember($memberNumber){
+    $.ajax({
+          url: 'index.php',
+          type: 'POST',
+          data: { 
+              "memberNumber": $memberNumber,
+              "type": 'remove'
+              },
+          success: function (response) {
+              console.log(response);
+              if(response == 'succeed'){
+                  location.reload();
+              }
+          }
+      });
+  }
+  
+</script>
 
 </html>
